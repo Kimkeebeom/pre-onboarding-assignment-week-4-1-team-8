@@ -9,15 +9,20 @@ import {
   DEFAULT_PAGE_NUMBER,
   getChangedDate,
   getChangedMaskingPhoneNumber,
+  USER_URL,
 } from '../../lib';
+import { EditOutlined } from '@ant-design/icons';
+import http from '../../lib/api/base';
 
 function UserDetailContent() {
   const location = useLocation();
   const navigate = useNavigate();
+
   const { data: accounts } = useAccountQuery({
     page: DEFAULT_PAGE_NUMBER,
     limit: DEFAULT_PAGE_LIMIT_COUNT,
   });
+
   const { data: userSettings } = useUserSettingQuery({
     page: DEFAULT_PAGE_NUMBER,
     limit: DEFAULT_PAGE_LIMIT_COUNT,
@@ -76,6 +81,20 @@ function UserDetailContent() {
     }
   );
 
+  const updateUserName = async ({ id }) => {
+    const updateVariables = {
+      ...user,
+    };
+
+    if (user.userName) updateVariables.userName = user.userName;
+    const response = await http
+      .put({ url: `${USER_URL}/${id}`, updateVariables })
+      .catch((err) => {
+        alert(err);
+      });
+    return response.data;
+  };
+
   const handleClickBackButton = () => {
     navigate(-1);
   };
@@ -87,7 +106,10 @@ function UserDetailContent() {
       <Descriptions
         title={
           <div>
-            <h3>유저 상세정보</h3>
+            <h3>
+              유저 상세정보
+              <EditOutlined onClick={updateUserName} />
+            </h3>
             <UserProfile src={user.photo} alt={user.userName} />
           </div>
         }
